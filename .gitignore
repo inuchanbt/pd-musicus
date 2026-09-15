@@ -1,0 +1,27 @@
+# Local captures and generated media
+/captures/
+/output/
+/local/
+*.wav
+!/examples/*.wav
+*.score.json
+
+# Python environments and caches
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local configuration and editor files
+.env
+.env.*
+!.env.example
+.vscode/
+.idea/
+*.tmp
+*.log
+.DS_Store
+Thumbs.db
