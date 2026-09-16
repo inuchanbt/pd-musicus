@@ -24,6 +24,7 @@ def load_points(path):
                            phase=samples[0]["cts_like_phase"],
                            target_voltage_V=float(samples[0]["target_voltage_v"]),
                            actual_voltage_V=median(voltage), actual_power_W=median(watts),
+                           actual_current_A=median(float(r["actual_current_a"]) for r in samples),
                            statuses=sorted({r["cts_like_status"] for r in samples})))
     if not points:
         raise ValueError("No CTS points")

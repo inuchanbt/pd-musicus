@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PD musicus · Listen to the conversation</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<div class="shell">
+<header><a class="brand" href="#">◈ <strong>PD musicus</strong><span>LISTEN TO THE CONVERSATION</span></a><span class="badge">PROTOCOL PLAYER / 0.2</span></header>
+<main>
+<div class="heading"><div><p class="eyebrow">ELECTRICITY, WITH A VOICE</p><h1>Hear the handshake.</h1><p class="sub">Follow each request, response, and change in power.</p></div><span id="mode" class="badge">READY TO LISTEN</span></div>
+<section class="library" aria-label="Choose a recording"><button class="sample selected" data-sample="avs_0p5a"><span>01 / GENTLE</span><strong>0.5 A · The quiet exchange</strong></button><button class="sample" data-sample="avs_5a"><span>02 / HIGH POWER</span><strong>5 A · Turn up the current</strong></button><label class="import">＋ Open your recording<input id="files" type="file" accept=".wav,.json,audio/wav,application/json" multiple><small>Select a WAV + its .score.json together</small></label></section>
+<p id="status" role="status">Choose a sample, or open your WAV and score JSON. Local files stay in this browser.</p>
+<div class="workspace">
+<section class="stage" id="stage" aria-label="Current event">
+<div class="stage-top"><span class="eyebrow">THE CONVERSATION</span><span id="event-count">— EVENTS</span></div>
+<div class="devices"><div class="device" id="source"><span class="device-icon">↯</span><strong>SOURCE</strong><small>Power supply</small></div><div class="wire"><span id="direction">···</span><div id="packet"></div></div><div class="device" id="sink"><span class="device-icon">⌁</span><strong>SINK</strong><small>Load / device</small></div></div>
+<div class="event-card"><p id="event-type" class="eyebrow">PRELUDE</p><h2 id="event-label">A conversation waiting to happen.</h2><p id="event-detail">Press play to begin.</p><p id="provenance" class="muted">Events follow the musical arrangement.</p></div>
+<div id="spectrum" class="spectrum" aria-hidden="true"></div>
+<div class="stage-footer"><span id="source-ref">—</span><span id="timing">ARRANGED TIME</span></div>
+</section>
+<aside class="power-panel"><p class="eyebrow">MEASURED POWER</p><div class="watts"><span id="watts">—</span><span>W</span></div><div class="power-track"><div id="power-fill"></div></div><div class="scale"><span>0 W</span><span>240 W</span></div><div class="readings"><div><span>VOLTAGE</span><strong id="voltage">— V</strong></div><div><span>CURRENT</span><strong id="current">— A</strong></div></div><div class="power-caption"><span id="mood" class="badge">WAITING</span><p id="measurement-caption">Measurement values appear when available.</p></div><p class="muted">Values belong to the arranged measurement point, not a live meter.</p></aside>
+</div>
+<section class="transport" aria-label="Playback controls"><button id="play" disabled aria-label="Play">▶</button><div class="scrubber"><div class="track-caption"><strong id="track">No recording loaded</strong><span><span id="position">00:00</span> / <span id="duration">00:00</span></span></div><input id="seek" aria-label="Playback position" type="range" min="0" max="1" step="0.01" value="0" disabled></div><label class="volume">VOL <input id="volume" aria-label="Volume" type="range" min="0" max="1" step="0.01" value="0.65"></label></section>
+<section class="timeline"><div class="timeline-heading"><h3>Event trail</h3><span>Click an event to jump to its sound</span></div><div id="trail" class="trail"><p class="muted">Your event history will appear here.</p></div></section>
+<details><summary>About this view</summary><p>The playhead follows the audio clock. Events use arranged musical time, not original protocol latency. Resets can have interpolated positions. CTS recordings show measurement cases rather than inferred protocol packets. Accompaniment can continue between events. The animated bars illustrate playback and power; they are not a measured audio spectrum.</p><p>Open files are processed locally. No upload, analytics, or external assets. Video export is not included in this version.</p></details>
+</main><footer><span>PD musicus — give power a voice.</span><span>WAV + TIMELINE / OFFLINE FRIENDLY</span></footer>
+</div><audio id="audio" preload="metadata"></audio><script src="timeline.js"></script><script src="app.js"></script>
+</body></html>

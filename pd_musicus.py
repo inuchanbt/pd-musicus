@@ -12,7 +12,7 @@ import cts_music
 import pd_music
 import power_music
 
-VERSION = "0.1.0"
+VERSION = "0.2.0"
 
 
 def reset_kind(event):
@@ -154,7 +154,10 @@ def build_plan(path, mode="auto", asd=None, bpm=None):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--version", action="version", version=f"PD musicus {VERSION}")
-    parser.add_argument("input", type=Path, help="CY4500 Utility PD CSV or ASD CTS-like CSV")
+    parser.add_argument("input", type=Path, nargs="?", help="CY4500 Utility PD CSV or ASD CTS-like CSV")
+    parser.add_argument("--player", action="store_true", help="Open the local synchronized audio/protocol player")
+    parser.add_argument("--port", type=int, default=8765, help="Local player port (default 8765)")
+    parser.add_argument("--no-browser", action="store_true", help="Start the player without opening a browser")
     parser.add_argument("--mode", choices=("auto", "conversation", "duet", "avs", "power", "cts"), default="auto")
     parser.add_argument("--asd", type=Path, help="Matching ASD AVS sweep CSV for power mode")
     parser.add_argument("--bpm", type=float)
@@ -163,6 +166,19 @@ def main(argv=None):
     parser.add_argument("--overwrite", action="store_true")
     parser.add_argument("--max-seconds", type=float, default=180, help="Reject longer arrangements; maximum 600")
     args = parser.parse_args(argv)
+    if args.player:
+        if args.input or args.asd or args.out or args.plan_only or args.mode != "auto" or args.bpm is not None:
+            parser.error("--player cannot be combined with arrangement arguments")
+        if not 1 <= args.port <= 65535:
+            parser.error("--port must be between 1 and 65535")
+        from pd_musicus_player import run
+        try:
+            run(args.port, not args.no_browser)
+        except OSError as exc:
+            parser.exit(1, f"Could not start player: {exc}\n")
+        return
+    if args.input is None:
+        parser.error("Provide an input CSV or use --player")
     out = args.out or Path("output") / (args.input.stem + "_musicus.wav")
     score_path = out.with_suffix(".score.json")
     try:

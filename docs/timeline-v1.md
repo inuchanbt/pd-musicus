@@ -1,6 +1,6 @@
 # PD musicus timeline schema 1
 
-`schema_version: 1`, `app_version: 0.1.0`。
+`schema_version: 1`。`app_version` は生成したアプリのバージョン（現在0.2.0）です。
 時間はすべて編曲後の音声先頭を0とする秒数です。元の測定時間とは異なります。
 
 ## トップレベル
@@ -25,6 +25,8 @@ powerではASD行番号・実測値・強度も加わります。
 
 CTS測定イベントは `kind: measurement`。`source_lines` はヘッダーを1行目とするASD CSVの物理行番号。
 `data` にケースID、測定中央値、状態一覧、音域、強度を保存します。
+0.2.0以降のCTSデータには `actual_current_A`（実測電流の中央値）も含まれます。
+古いスコアでこの値がない場合、プレイヤーは電流欄を空欄として表示します。
 
 `timing` は `arranged`、`one_beat_per_case`、または `interpolated_between_arranged_events`。
 補間イベントを実際の応答遅延の測定値として表示しないでください。

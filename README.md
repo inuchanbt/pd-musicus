@@ -6,7 +6,32 @@ Source capabilities become melodies, requests and responses become musical excha
 and higher measured power adds guitar distortion, drums, and denser rhythms.
 Resets and failed measurement states have their own musical accents.
 
-**Version 0.1.0** · [日本語README](README.ja.md)
+**Version 0.2.0** · [日本語README](README.ja.md)
+
+## Watch the conversation
+
+```sh
+python pd_musicus.py --player
+```
+
+This opens a local browser player with the two included audio examples. It displays
+the current protocol event, source/sink direction, surrounding events, and measured
+voltage/current/power when available. Pause, seek, or click an event to jump to its sound.
+
+Use **Open your recording** to select one WAV and its matching schema-1 `.score.json`
+together. Files are processed in the browser and are not uploaded. CTS scores display
+measurement cases; protocol scores distinguish Soft Reset and Hard Reset.
+
+The player binds only to `127.0.0.1` and serves a fixed set of player/sample files,
+not your private capture directories. Press Ctrl+C in the terminal to stop it.
+Use `--port 18765` to request a different port, or `--no-browser` to print the URL
+without opening a tab. If the requested port is unavailable, an available local port is used.
+You can also open `player/index.html` directly for local WAV/JSON selection; bundled
+sample buttons require the local server. A modern browser with WAV playback is required.
+
+The view follows **arranged audio time**, not original wire timing. Measurements belong
+to an arranged point, not a live meter. Animated bars illustrate playback/power rather
+than an audio spectrum. Video export is not included yet.
 
 ## Listen first
 
@@ -143,20 +168,24 @@ Each render produces:
 The pipeline separates **input parsing → arrangement → audio rendering**.
 The versioned [timeline schema](docs/timeline-v1.md) provides a foundation for future
 protocol highlighting, power-driven visual effects, and alternative instrument renderers.
-The current version does not include a synchronized visual player or sampled instruments.
+The local player uses this timeline; sampled instruments and video export are not yet included.
 
 ## Development
 
 ```sh
 python -m unittest -v
+node player/test_timeline.cjs
 ```
 
 Tests cover input validation, request/response mapping, resets, power-dependent
-density, timeline tempo scaling, output protection, and PCM generation.
+density, timeline tempo scaling, output protection, PCM generation, and local HTTP access/ranges.
+The optional JavaScript test uses Node.js and checks timeline seeking, resets, and validation;
+Node.js is not needed to run the player.
 
 | File | Responsibility |
 | --- | --- |
 | `pd_musicus.py` | Unified CLI, mode selection, common timeline, output controls |
+| `pd_musicus_player.py`, `player/` | Local HTTP server and synchronized browser player |
 | `pd_music.py` | PD CSV parser, general arrangements, synthesizer/WAV renderer |
 | `avs_music.py` | EPR AVS extraction and melodic arrangement |
 | `power_music.py` | ASD sweep matching and power-dependent orchestration |
@@ -171,11 +200,11 @@ The Japanese README provides a public Japanese-language guide.
 
 - Refine instrument sounds against a broader set of captures.
 - Add sampled instruments and more expressive guitar articulation.
-- Highlight the protocol event corresponding to the current playback position.
-- Animate voltage, watts, resets, and musical intensity.
+- Expand the synchronized protocol view and power-driven visual effects.
+- Export synchronized video.
 - Expand input formats and PPS/SPR AVS decoding.
 
-These are future directions, not features included in v0.1.0.
+These are future directions beyond the current player.
 
 ## License
 
