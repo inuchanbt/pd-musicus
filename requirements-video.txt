@@ -1,0 +1,2 @@
+# Optional: only needed by pd_musicus_video.py. Install FFmpeg separately.
+Pillow>=10.1

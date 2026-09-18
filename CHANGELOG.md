@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- WAVとschema 1スコアから720p・音付きMP4を作る `pd_musicus_video.py`。
+- プロトコル、通信方向、リセット、測定電力とイベント履歴の同期表示。
+- PillowとFFmpegは動画出力時だけ必要。既存ファイル保護と長さ照合。
+
 ## 0.2.0 — 2026-09-16
 
 - `--player` で起動するローカル同期プレイヤー。

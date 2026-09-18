@@ -26,7 +26,57 @@ PD版はSoft Reset／Hard Resetを区別します。
 `player/index.html` を直接開いてローカルWAV／JSONを選ぶこともできますが、同梱サンプルボタンにはサーバーが必要です。
 
 表示は編曲後の音声時間に対応し、実際の通信遅延ではありません。実測値はその測定点の値です。
-動くバーは再生状態と電力の演出で、音声スペクトラムではありません。動画書き出しは今後の機能です。
+動くバーは再生状態と電力の演出で、音声スペクトラムではありません。
+
+## 動画を書き出す
+
+WAVと対応するスコアから、プロトコル表示・通信方向・電力に応じた動きを含む
+1280×720の音付きMP4を生成できます。画面録画ではなく、各フレームを直接描画します。
+音声はWAVからAACに変換されます。
+
+libx264／AAC対応のFFmpegをインストールしてPATHを通し、追加のPython依存を入れます。
+
+```sh
+python -m pip install -r requirements-video.txt
+python pd_musicus.py examples/avs_5a_pd.csv --asd examples/avs_5a_asd.csv --mode power --plan-only --out output/avs_5a_video.wav
+python pd_musicus_video.py examples/avs_5a.wav --score output/avs_5a_video.score.json --out output/avs_5a.mp4 --title "EPR AVS / 5 A"
+```
+
+`--plan-only` のコマンドは同梱WAVに対応する既定テンポのスコアだけを生成します。
+自分のログでは、同じ生成処理から得たWAVとスコアを指定してください。
+長さの一致は検証しますが、同一セッション由来であることまでは判定できません。
+`--fps 24|30|60`（既定30）、`--font フォント.ttf`、`--ffmpeg 実行ファイル`、
+`--overwrite`を指定できます。動画は最大600秒です。
+音楽上の時刻に同期し、リセットも表示します。CTS入力では測定ケースを表示します。
+書き出しは専用CLIから行います。ブラウザのプレイヤーに書き出しボタンはありません。
+
+### 自分の測定ログから作る
+
+手元のログに合わせて、音楽生成の引数を選びます。
+
+| 手元のログ | `pd_musicus.py` に渡す引数 |
+| --- | --- |
+| CY4500 Utility形式のPD CSV：通信全体の掛け合い | `captures/pd.csv --mode duet` |
+| CY4500 Utility形式のPD CSV：EPR AVS掃引 | `captures/pd.csv --mode avs` |
+| 同一試験のPD CSV＋ASD AVS CSV | `captures/pd.csv --asd captures/asd.csv --mode power` |
+| ASDのCTS-like測定CSV | `captures/cts.csv --mode cts` |
+
+例えば実測電力に応じた音楽と動画を作る場合：
+
+```sh
+python pd_musicus.py "captures/pd.csv" --asd "captures/asd.csv" --mode power --out "output/my_session.wav"
+python pd_musicus_video.py "output/my_session.wav" --score "output/my_session.score.json" --out "output/my_session.mp4" --title "My PD session"
+```
+
+入力パスを自分のファイルに置き換えてください。1行目でWAVと対応するスコアJSONを生成し、
+2行目でMP4にします。各コマンドはPowerShellでもそのまま1行で実行できます。
+作り直す場合は各コマンドに `--overwrite` を追加します。
+音楽生成の長さ上限は既定180秒。長い編曲には `pd_musicus.py` 側に
+`--max-seconds 600` を付けられます（最大600秒）。
+
+対応するCSV形式が対象で、任意の測定器の出力を読み込めるわけではありません。
+CTSだけなら測定ケースを表示し、PDメッセージは推測しません。
+実測電力の表示には対応するASDデータが必要で、PD要求値だけでは実測値になりません。
 
 ## まず聴いてみる
 
@@ -43,7 +93,8 @@ PD版はSoft Reset／Hard Resetを区別します。
 
 ## 実行環境
 
-Python 3.10以降。外部パッケージは不要です。
+Python 3.10以降。音楽生成とブラウザープレイヤーには外部パッケージは不要です。
+MP4出力だけはPillow（`requirements-video.txt`）とlibx264／AAC対応のFFmpegが必要です。
 各Pythonファイルを同じフォルダーに置き、リポジトリのルートで実行します。
 保存済みログを使うため、試聴・再生成に測定機器は必要ありません。
 
@@ -101,7 +152,7 @@ CTSのfailed状態は不協和音で残し、測定失敗から実際のPDリセ
 
 ログ読込み、編曲、音声化を分離しています。[タイムライン仕様](docs/timeline-v1.md)は、
 将来のプロトコル逐次表示や電力連動の視覚効果に使えます。
-同期プレイヤーを同梱しています。録音サンプル音源と動画書き出しは未実装です。
+同期プレイヤーと動画書き出しを同梱しています。録音サンプル音源は未実装です。
 
 ## 対応範囲
 

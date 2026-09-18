@@ -31,7 +31,58 @@ sample buttons require the local server. A modern browser with WAV playback is r
 
 The view follows **arranged audio time**, not original wire timing. Measurements belong
 to an arranged point, not a live meter. Animated bars illustrate playback/power rather
-than an audio spectrum. Video export is not included yet.
+than an audio spectrum.
+
+## Export a video
+
+The optional offline exporter makes a 1280×720 MP4 with synchronized event labels,
+Source/Sink direction, power-driven animation, and the WAV audio (encoded as AAC).
+It renders frames directly, so no browser recording is needed.
+
+Install [FFmpeg](https://ffmpeg.org/) with libx264/AAC support and make `ffmpeg`
+available on PATH, then install the optional Python dependency:
+
+```sh
+python -m pip install -r requirements-video.txt
+python pd_musicus.py examples/avs_5a_pd.csv --asd examples/avs_5a_asd.csv --mode power --plan-only --out output/avs_5a_video.wav
+python pd_musicus_video.py examples/avs_5a.wav --score output/avs_5a_video.score.json --out output/avs_5a.mp4 --title "EPR AVS / 5 A"
+```
+
+The `--plan-only` command creates only the score, matching the included default-tempo WAV.
+For your own recordings, use the WAV and score from the same rendering run.
+Matching duration is checked; it does not prove that two files belong together.
+Options: `--fps 24|30|60` (default 30), `--font path/to/font.ttf`,
+`--ffmpeg path/to/ffmpeg`, and `--overwrite`. Videos are limited to 600 seconds.
+The video follows the arranged timeline, including resets; CTS inputs show cases.
+This is a separate CLI export, with no export button in the browser player.
+
+### From your own measurement logs
+
+Choose the audio arrangement for your input:
+
+| Logs available | Arguments for `pd_musicus.py` |
+| --- | --- |
+| CY4500 Utility PD CSV: general conversation | `captures/pd.csv --mode duet` |
+| CY4500 Utility PD CSV: EPR AVS sweep | `captures/pd.csv --mode avs` |
+| PD CSV + ASD AVS CSV from the same test | `captures/pd.csv --asd captures/asd.csv --mode power` |
+| ASD CTS-like measurement CSV | `captures/cts.csv --mode cts` |
+
+For example, render a power-driven arrangement and then its video:
+
+```sh
+python pd_musicus.py "captures/pd.csv" --asd "captures/asd.csv" --mode power --out "output/my_session.wav"
+python pd_musicus_video.py "output/my_session.wav" --score "output/my_session.score.json" --out "output/my_session.mp4" --title "My PD session"
+```
+
+Replace the capture paths with your files. The first command creates both the WAV
+and matching score; the second creates the MP4. These single-line commands also
+work in PowerShell. Add `--overwrite` to each command when replacing existing output.
+Audio generation defaults to a 180-second limit; use `--max-seconds 600` on
+`pd_musicus.py` for longer arrangements, up to 600 seconds.
+
+Only the supported CSV formats are accepted, not arbitrary measurement exports.
+CTS-only input shows measurement cases, without inferred PD messages. Actual measured
+power requires the matching ASD data; PD requests alone are not power measurements.
 
 ## Listen first
 
@@ -48,7 +99,8 @@ Depending on your browser, open or download the WAV to play it.
 
 ## Requirements
 
-- Python 3.10 or later; no third-party packages required.
+- Python 3.10 or later; audio generation and the browser player need no third-party packages.
+- Optional MP4 export: Pillow (`requirements-video.txt`) and FFmpeg with libx264/AAC support.
 - A supported CSV capture (see below).
 
 Keep the Python modules together and run commands from the repository root.
@@ -168,7 +220,7 @@ Each render produces:
 The pipeline separates **input parsing → arrangement → audio rendering**.
 The versioned [timeline schema](docs/timeline-v1.md) provides a foundation for future
 protocol highlighting, power-driven visual effects, and alternative instrument renderers.
-The local player uses this timeline; sampled instruments and video export are not yet included.
+The local player and video exporter use this timeline; sampled instruments are not yet included.
 
 ## Development
 
@@ -186,6 +238,7 @@ Node.js is not needed to run the player.
 | --- | --- |
 | `pd_musicus.py` | Unified CLI, mode selection, common timeline, output controls |
 | `pd_musicus_player.py`, `player/` | Local HTTP server and synchronized browser player |
+| `pd_musicus_video.py` | Optional offline MP4 renderer |
 | `pd_music.py` | PD CSV parser, general arrangements, synthesizer/WAV renderer |
 | `avs_music.py` | EPR AVS extraction and melodic arrangement |
 | `power_music.py` | ASD sweep matching and power-dependent orchestration |
@@ -201,7 +254,7 @@ The Japanese README provides a public Japanese-language guide.
 - Refine instrument sounds against a broader set of captures.
 - Add sampled instruments and more expressive guitar articulation.
 - Expand the synchronized protocol view and power-driven visual effects.
-- Export synchronized video.
+- Add more video layouts and visual effects.
 - Expand input formats and PPS/SPR AVS decoding.
 
 These are future directions beyond the current player.
